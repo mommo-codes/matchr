@@ -4,3 +4,4 @@ pub mod jaro_winkler;
 pub mod trigram;
 
 pub use normalize::normalize;
+pub use levenshtein::levenshtein;
