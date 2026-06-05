@@ -14,11 +14,13 @@ use crate::normalize;
 /// assert!((jaro_winkler("martha", "marhta") - 0.961).abs() < 0.001);
 /// assert!((jaro_winkler("cat", "cat") - 1.0).abs() < 0.001);
 /// ```
-
 pub fn jaro_winkler(a: &str, b: &str) -> f64 {
     let a = normalize(a);
     let b = normalize(b);
+    jaro_winkler_raw(&a, &b)
+}
 
+pub(crate) fn jaro_winkler_raw(a: &str, b: &str) -> f64 {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
 
@@ -117,5 +119,19 @@ mod tests {
     #[test]
     fn test_case_insensitive() {
         assert!(approx(jaro_winkler("Martha", "marhta"), 0.961));
+    }
+
+    #[test]
+    fn test_raw_skips_normalization() {
+        assert!(jaro_winkler_raw("Martha", "marhta") < 1.0);
+        assert!(approx(jaro_winkler_raw("martha", "marhta"), 0.961));
+    }
+
+    #[test]
+    fn test_raw_matches_public_on_normalized_input() {
+        assert!(approx(
+            jaro_winkler_raw("martha", "marhta"),
+            jaro_winkler("martha", "marhta"),
+        ));
     }
 }

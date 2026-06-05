@@ -15,13 +15,15 @@ use std::collections::HashMap;
 /// assert!((trigram_similarity("hello", "hello") - 1.0).abs() < 0.001);
 /// assert!((trigram_similarity("abc", "xyz") - 0.0).abs() < 0.001);
 /// ```
-
 pub fn trigram_similarity(a: &str, b: &str) -> f64 {
     let a = normalize(a);
     let b = normalize(b);
+    trigram_similarity_raw(&a, &b)
+}
 
-    let a_tri = trigrams(&a);
-    let b_tri = trigrams(&b);
+pub(crate) fn trigram_similarity_raw(a: &str, b: &str) -> f64 {
+    let a_tri = trigrams(a);
+    let b_tri = trigrams(b);
 
     if a_tri.is_empty() && b_tri.is_empty() {
         return 1.0;
@@ -90,5 +92,19 @@ mod tests {
     #[test]
     fn test_case_insensitive() {
         assert!(approx(trigram_similarity("Hello", "hello"), 1.0));
+    }
+
+    #[test]
+    fn test_raw_skips_normalization() {
+        assert!(trigram_similarity_raw("Hello", "hello") < 1.0);
+        assert!(approx(trigram_similarity_raw("hello", "hello"), 1.0));
+    }
+
+    #[test]
+    fn test_raw_matches_public_on_normalized_input() {
+        assert!(approx(
+            trigram_similarity_raw("hello", "helo"),
+            trigram_similarity("hello", "helo"),
+        ));
     }
 }

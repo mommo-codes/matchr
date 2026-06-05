@@ -14,11 +14,13 @@ use crate::normalize;
 /// assert_eq!(levenshtein("cat", "bat"), 1);
 /// assert_eq!(levenshtein("cat", "cat"), 0);
 /// ```
-
 pub fn levenshtein(a: &str, b: &str) -> usize {
     let a = normalize(a);
     let b = normalize(b);
+    levenshtein_raw(&a, &b)
+}
 
+pub(crate) fn levenshtein_raw(a: &str, b: &str) -> usize {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
 
@@ -27,11 +29,11 @@ pub fn levenshtein(a: &str, b: &str) -> usize {
 
     let mut dp = vec![vec![0usize; n + 1]; m + 1];
 
-    for i in 0..=m {
-        dp[i][0] = i;
+    for (i, row) in dp.iter_mut().enumerate() {
+        row[0] = i;
     }
-    for j in 0..=n {
-        dp[0][j] = j;
+    for (j, cell) in dp[0].iter_mut().enumerate() {
+        *cell = j;
     }
 
     for i in 1..=m {
@@ -74,5 +76,16 @@ mod tests {
     #[test]
     fn test_completely_different() {
         assert_eq!(levenshtein("cat", "dog"), 3);
+    }
+
+    #[test]
+    fn test_raw_skips_normalization() {
+        assert_eq!(levenshtein_raw("Cat", "cat"), 1);
+        assert_eq!(levenshtein_raw(" cat", "cat"), 1);
+    }
+
+    #[test]
+    fn test_raw_matches_public_on_normalized_input() {
+        assert_eq!(levenshtein_raw("cat", "bat"), levenshtein("cat", "bat"));
     }
 }

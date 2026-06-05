@@ -49,6 +49,7 @@ fn main() {
 
 ## Notes
 
-- All functions normalise input (lowercase + trim) before comparing
+- All functions normalise input (trim + lowercase + strip diacritics) before comparing — `"Café"` and `"cafe"` are treated as equal
 - `levenshtein` returns `usize` (edit distance), all others return `f64` (0.0–1.0)
 - Python functions accept an optional `threshold` parameter — results below it are filtered out
+- `batch_best_match` is parallelised via rayon and pre-normalises the candidate list once, so it scales with available cores
