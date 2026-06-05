@@ -1,5 +1,20 @@
 use crate::normalize;
 
+/// Computes the Jaro-Winkler similarity between two strings.
+///
+/// Returns a score from `0.0` (no similarity) to `1.0` (identical).
+/// Gives a bonus for shared prefixes — works well for names.
+/// Input is normalised before comparison.
+///
+/// # Examples
+///
+/// ```
+/// use matchr::jaro_winkler;
+///
+/// assert!((jaro_winkler("martha", "marhta") - 0.961).abs() < 0.001);
+/// assert!((jaro_winkler("cat", "cat") - 1.0).abs() < 0.001);
+/// ```
+
 pub fn jaro_winkler(a: &str, b: &str) -> f64 {
     let a = normalize(a);
     let b = normalize(b);

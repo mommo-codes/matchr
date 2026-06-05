@@ -1,6 +1,21 @@
 use crate::normalize;
 use std::collections::HashMap;
 
+/// Computes trigram similarity between two strings.
+///
+/// Splits strings into overlapping 3-character chunks and scores
+/// overlap using the Dice coefficient. Returns `0.0`–`1.0`.
+/// Input is normalised before comparison.
+///
+/// # Examples
+///
+/// ```
+/// use matchr::trigram_similarity;
+///
+/// assert!((trigram_similarity("hello", "hello") - 1.0).abs() < 0.001);
+/// assert!((trigram_similarity("abc", "xyz") - 0.0).abs() < 0.001);
+/// ```
+
 pub fn trigram_similarity(a: &str, b: &str) -> f64 {
     let a = normalize(a);
     let b = normalize(b);

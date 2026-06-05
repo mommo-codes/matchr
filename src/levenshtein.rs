@@ -1,5 +1,20 @@
 use crate::normalize;
 
+/// Computes the Levenshtein edit distance between two strings.
+///
+/// Returns the minimum number of single-character edits (insert,
+/// delete, substitute) to transform `a` into `b`. Input is
+/// normalised (lowercased, trimmed) before comparison.
+///
+/// # Examples
+///
+/// ```
+/// use matchr::levenshtein;
+///
+/// assert_eq!(levenshtein("cat", "bat"), 1);
+/// assert_eq!(levenshtein("cat", "cat"), 0);
+/// ```
+
 pub fn levenshtein(a: &str, b: &str) -> usize {
     let a = normalize(a);
     let b = normalize(b);
