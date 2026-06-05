@@ -1,11 +1,11 @@
 use pyo3::prelude::*;
 use crate::{
-    levenshtein   as lev_fn,
-    jaro_winkler  as jw_fn,
+    levenshtein        as lev_fn,
+    jaro_winkler       as jw_fn,
     trigram_similarity as tri_fn,
-    combined_score as cs_fn,
-    best_match    as bm_fn,
-    rank_matches  as rm_fn,
+    combined_score     as cs_fn,
+    best_match         as bm_fn,
+    rank_matches       as rm_fn,
 };
 
 #[pyfunction]
@@ -50,6 +50,23 @@ fn rank_matches(
         .collect()
 }
 
+#[pyfunction]
+#[pyo3(signature = (queries, candidates, threshold=None))]
+fn batch_best_match(
+    queries: Vec<String>,
+    candidates: Vec<String>,
+    threshold: Option<f64>,
+) -> Vec<Option<(String, f64)>> {
+    let refs: Vec<&str> = candidates.iter().map(|s| s.as_str()).collect();
+    let min = threshold.unwrap_or(0.0);
+
+    queries.iter().map(|q| {
+        bm_fn(q, &refs)
+            .filter(|(_, score)| *score >= min)
+            .map(|(s, score)| (s.to_string(), score))
+    }).collect()
+}
+
 #[pymodule]
 fn matchr(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(levenshtein, m)?)?;
@@ -58,5 +75,6 @@ fn matchr(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(combined_score, m)?)?;
     m.add_function(wrap_pyfunction!(best_match, m)?)?;
     m.add_function(wrap_pyfunction!(rank_matches, m)?)?;
+    m.add_function(wrap_pyfunction!(batch_best_match, m)?)?;
     Ok(())
 }
