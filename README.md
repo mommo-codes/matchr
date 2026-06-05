@@ -45,7 +45,12 @@ fn main() {
 - **Levenshtein** — minimum edit distance between two strings. Lower = more similar.
 - **Jaro-Winkler** — similarity score from `0.0` to `1.0`, optimised for names and short strings. Gives a bonus for shared prefixes.
 - **Trigram** — splits strings into overlapping 3-character chunks, scores overlap using the Dice coefficient. Good for longer strings and typo detection.
-- **Combined score** — weighted blend of all three, used internally by `best_match` and `rank_matches`.
+- **Token sort / token set** — order-invariant scorers built on top of `combined_score`. Sorts (and optionally deduplicates) whitespace-separated tokens before comparing, so `"Oat Drink Oatly 1L"` and `"Oatly Oat Drink 1L"` come out equal.
+- **Combined score** — weighted blend of Levenshtein, Jaro-Winkler, and trigram. Used internally by `best_match`, `rank_matches`, and `batch_best_match`.
+
+## Benchmarks
+
+See [`benchmarks/`](benchmarks/) for the criterion suite (`cargo bench`) and a Python comparison vs `rapidfuzz`. There's also a [demo notebook](benchmarks/demo.ipynb) that walks through deduping a synthetic 10k-product catalog end-to-end.
 
 ## Notes
 

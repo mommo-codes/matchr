@@ -1,0 +1,30 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "matchr"
+dynamic = ["version"]
+requires-python = ">=3.8"
+description = "Fast fuzzy string matching — Levenshtein, Jaro-Winkler, and trigram similarity. Written in Rust."
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["fuzzy", "string-matching", "levenshtein", "jaro-winkler", "similarity"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Intended Audience :: Developers",
+]
+
+[project.urls]
+Homepage = "https://github.com/mommo-codes/matchr"
+Repository = "https://github.com/mommo-codes/matchr"
+
+[tool.maturin]
+python-source = "python"
+module-name = "matchr.matchr"
+features = ["pyo3/extension-module"]
