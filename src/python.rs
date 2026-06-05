@@ -1,49 +1,62 @@
 use pyo3::prelude::*;
-use crate::{levenshtein, jaro_winkler, trigram_similarity, combined_score};
-use crate::{best_match, rank_matches};
+use crate::{
+    levenshtein   as lev_fn,
+    jaro_winkler  as jw_fn,
+    trigram_similarity as tri_fn,
+    combined_score as cs_fn,
+    best_match    as bm_fn,
+    rank_matches  as rm_fn,
+};
 
 #[pyfunction]
-fn py_levenshtein(a: &str, b: &str) -> usize {
-    levenshtein(a, b)
-}
+fn levenshtein(a: &str, b: &str) -> usize { lev_fn(a, b) }
 
 #[pyfunction]
-fn py_jaro_winkler(a: &str, b: &str) -> f64 {
-    jaro_winkler(a, b)
-}
+fn jaro_winkler(a: &str, b: &str) -> f64 { jw_fn(a, b) }
 
 #[pyfunction]
-fn py_trigram_similarity(a: &str, b: &str) -> f64 {
-    trigram_similarity(a, b)
-}
+fn trigram_similarity(a: &str, b: &str) -> f64 { tri_fn(a, b) }
 
 #[pyfunction]
-fn py_combined_score(a: &str, b: &str) -> f64 {
-    combined_score(a, b)
-}
+fn combined_score(a: &str, b: &str) -> f64 { cs_fn(a, b) }
 
 #[pyfunction]
-fn py_best_match(query: &str, candidates: Vec<String>) -> Option<(String, f64)> {
+#[pyo3(signature = (query, candidates, threshold=None))]
+fn best_match(
+    query: &str,
+    candidates: Vec<String>,
+    threshold: Option<f64>,
+) -> Option<(String, f64)> {
     let refs: Vec<&str> = candidates.iter().map(|s| s.as_str()).collect();
-    best_match(query, &refs).map(|(s, score)| (s.to_string(), score))
+    let min = threshold.unwrap_or(0.0);
+    bm_fn(query, &refs)
+        .filter(|(_, score)| *score >= min)
+        .map(|(s, score)| (s.to_string(), score))
 }
 
 #[pyfunction]
-fn py_rank_matches(query: &str, candidates: Vec<String>) -> Vec<(String, f64)> {
+#[pyo3(signature = (query, candidates, threshold=None))]
+fn rank_matches(
+    query: &str,
+    candidates: Vec<String>,
+    threshold: Option<f64>,
+) -> Vec<(String, f64)> {
     let refs: Vec<&str> = candidates.iter().map(|s| s.as_str()).collect();
-    rank_matches(query, &refs)
+    let min = threshold.unwrap_or(0.0);
+    rm_fn(query, &refs)
         .into_iter()
+        .filter(|(_, score)| *score >= min)
         .map(|(s, score)| (s.to_string(), score))
         .collect()
 }
 
 #[pymodule]
 fn matchr(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(py_levenshtein, m)?)?;
-    m.add_function(wrap_pyfunction!(py_jaro_winkler, m)?)?;
-    m.add_function(wrap_pyfunction!(py_trigram_similarity, m)?)?;
-    m.add_function(wrap_pyfunction!(py_combined_score, m)?)?;
-    m.add_function(wrap_pyfunction!(py_best_match, m)?)?;
-    m.add_function(wrap_pyfunction!(py_rank_matches, m)?)?;
+    m.add_function(wrap_pyfunction!(levenshtein, m)?)?;
+    m.add_function(wrap_pyfunction!(jaro_winkler, m)?)?;
+    m.add_function(wrap_pyfunction!(trigram_similarity, m)?)?;
+    m.add_function(wrap_pyfunction!(combined_score, m)?)?;
+    m.add_function(wrap_pyfunction!(best_match, m)?)?;
+    m.add_function(wrap_pyfunction!(rank_matches, m)?)?;
     Ok(())
 }
