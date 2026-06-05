@@ -25,8 +25,12 @@ pub fn jaro_winkler(a: &str, b: &str) -> f64 {
     let a_len = a_chars.len();
     let b_len = b_chars.len();
 
-    if a_len == 0 && b_len == 0 { return 1.0; }
-    if a_len == 0 || b_len == 0 { return 0.0; }
+    if a_len == 0 && b_len == 0 {
+        return 1.0;
+    }
+    if a_len == 0 || b_len == 0 {
+        return 0.0;
+    }
 
     let match_window = (a_len.max(b_len) / 2).saturating_sub(1);
 
@@ -41,7 +45,9 @@ pub fn jaro_winkler(a: &str, b: &str) -> f64 {
         let end = (i + match_window + 1).min(b_len);
 
         for j in start..end {
-            if b_matches[j] || a_chars[i] != b_chars[j] { continue; }
+            if b_matches[j] || a_chars[i] != b_chars[j] {
+                continue;
+            }
             a_matches[i] = true;
             b_matches[j] = true;
             matches += 1;
@@ -49,22 +55,29 @@ pub fn jaro_winkler(a: &str, b: &str) -> f64 {
         }
     }
 
-    if matches == 0 { return 0.0; }
+    if matches == 0 {
+        return 0.0;
+    }
 
     let mut k = 0;
     for i in 0..a_len {
-        if !a_matches[i] { continue; }
-        while !b_matches[k] { k += 1; }
-        if a_chars[i] != b_chars[k] { transpositions += 1; }
+        if !a_matches[i] {
+            continue;
+        }
+        while !b_matches[k] {
+            k += 1;
+        }
+        if a_chars[i] != b_chars[k] {
+            transpositions += 1;
+        }
         k += 1;
     }
 
     let m = matches as f64;
-    let jaro = (m / a_len as f64
-              + m / b_len as f64
-              + (m - transpositions as f64 / 2.0) / m) / 3.0;
+    let jaro = (m / a_len as f64 + m / b_len as f64 + (m - transpositions as f64 / 2.0) / m) / 3.0;
 
-    let prefix = a_chars.iter()
+    let prefix = a_chars
+        .iter()
         .zip(b_chars.iter())
         .take(4)
         .take_while(|(x, y)| x == y)

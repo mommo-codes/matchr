@@ -1,11 +1,11 @@
-pub mod normalize;
-pub mod levenshtein;
 pub mod jaro_winkler;
+pub mod levenshtein;
+pub mod normalize;
 pub mod trigram;
 
-pub use normalize::normalize;
-pub use levenshtein::levenshtein;
 pub use jaro_winkler::jaro_winkler;
+pub use levenshtein::levenshtein;
+pub use normalize::normalize;
 pub use trigram::trigram_similarity;
 
 /// Blends all three algorithms into one similarity score.
@@ -29,7 +29,7 @@ pub fn combined_score(a: &str, b: &str) -> f64 {
         1.0 - (lev as f64 / max_len as f64)
     };
 
-    let jw  = jaro_winkler(a, b);
+    let jw = jaro_winkler(a, b);
     let tri = trigram_similarity(a, b);
 
     lev_sim * 0.35 + jw * 0.40 + tri * 0.25

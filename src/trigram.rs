@@ -23,12 +23,16 @@ pub fn trigram_similarity(a: &str, b: &str) -> f64 {
     let a_tri = trigrams(&a);
     let b_tri = trigrams(&b);
 
-    if a_tri.is_empty() && b_tri.is_empty() { return 1.0; }
-    if a_tri.is_empty() || b_tri.is_empty() { return 0.0; }
+    if a_tri.is_empty() && b_tri.is_empty() {
+        return 1.0;
+    }
+    if a_tri.is_empty() || b_tri.is_empty() {
+        return 0.0;
+    }
 
     let total = a_tri.len() + b_tri.len();
     let mut counts: HashMap<String, i32> = HashMap::new();
-    
+
     for t in &a_tri {
         *counts.entry(t.clone()).or_insert(0) += 1;
     }
@@ -44,13 +48,14 @@ pub fn trigram_similarity(a: &str, b: &str) -> f64 {
     }
 
     2.0 * shared as f64 / total as f64
-
 }
 
 fn trigrams(s: &str) -> Vec<String> {
     let chars: Vec<char> = s.chars().collect();
-    if chars.len() < 3 { return vec![]; }
-    chars.windows(3).map( |w| w.iter().collect()).collect()
+    if chars.len() < 3 {
+        return vec![];
+    }
+    chars.windows(3).map(|w| w.iter().collect()).collect()
 }
 
 #[cfg(test)]

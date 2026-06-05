@@ -1,24 +1,28 @@
-use pyo3::prelude::*;
 use crate::{
-    levenshtein        as lev_fn,
-    jaro_winkler       as jw_fn,
-    trigram_similarity as tri_fn,
-    combined_score     as cs_fn,
-    best_match         as bm_fn,
-    rank_matches       as rm_fn,
+    best_match as bm_fn, combined_score as cs_fn, jaro_winkler as jw_fn, levenshtein as lev_fn,
+    rank_matches as rm_fn, trigram_similarity as tri_fn,
 };
+use pyo3::prelude::*;
 
 #[pyfunction]
-fn levenshtein(a: &str, b: &str) -> usize { lev_fn(a, b) }
+fn levenshtein(a: &str, b: &str) -> usize {
+    lev_fn(a, b)
+}
 
 #[pyfunction]
-fn jaro_winkler(a: &str, b: &str) -> f64 { jw_fn(a, b) }
+fn jaro_winkler(a: &str, b: &str) -> f64 {
+    jw_fn(a, b)
+}
 
 #[pyfunction]
-fn trigram_similarity(a: &str, b: &str) -> f64 { tri_fn(a, b) }
+fn trigram_similarity(a: &str, b: &str) -> f64 {
+    tri_fn(a, b)
+}
 
 #[pyfunction]
-fn combined_score(a: &str, b: &str) -> f64 { cs_fn(a, b) }
+fn combined_score(a: &str, b: &str) -> f64 {
+    cs_fn(a, b)
+}
 
 #[pyfunction]
 #[pyo3(signature = (query, candidates, threshold=None))]
@@ -60,11 +64,14 @@ fn batch_best_match(
     let refs: Vec<&str> = candidates.iter().map(|s| s.as_str()).collect();
     let min = threshold.unwrap_or(0.0);
 
-    queries.iter().map(|q| {
-        bm_fn(q, &refs)
-            .filter(|(_, score)| *score >= min)
-            .map(|(s, score)| (s.to_string(), score))
-    }).collect()
+    queries
+        .iter()
+        .map(|q| {
+            bm_fn(q, &refs)
+                .filter(|(_, score)| *score >= min)
+                .map(|(s, score)| (s.to_string(), score))
+        })
+        .collect()
 }
 
 #[pymodule]
