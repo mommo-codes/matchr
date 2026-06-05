@@ -1,12 +1,12 @@
 [package]
-name = "matchr"
+name = "matchr-rs"
 version = "0.1.1"
 edition = "2021"
 description = "Fast fuzzy string matching — Levenshtein, Jaro-Winkler, and trigram similarity. Usable from Rust and Python."
 license = "MIT"
 repository = "https://github.com/mommo-codes/matchr"
 homepage = "https://github.com/mommo-codes/matchr"
-documentation = "https://docs.rs/matchr"
+documentation = "https://docs.rs/matchr-rs"
 readme = "README.md"
 keywords = ["fuzzy", "string-matching", "levenshtein", "jaro-winkler", "similarity"]
 categories = ["algorithms", "text-processing"]
